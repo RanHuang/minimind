@@ -85,7 +85,7 @@ def train_epoch(epoch, swanlab):
                            "epoch_Time": spend_time / (step + 1) * iter_per_epoch // 60 - spend_time // 60})
 
 def init_model(lm_config):
-    tokenizer = AutoTokenizer.from_pretrained('/data00/train/minimind/tokenizer')
+    tokenizer = AutoTokenizer.from_pretrained('/data00/train/doudou/tokenizer')
     model = DoudouForCausalLM(lm_config).to(args.device)
     logger.info(model)
     Logger(f'LLM可训练总参数量：{sum(p.numel() for p in model.parameters() if p.requires_grad) / 1e6:.3f} 百万')
@@ -96,7 +96,7 @@ def save_model(model, optimizer):
     import os
     if not os.path.exists(save_path):
         os.makedirs(save_path, exist_ok=True)
-    model_file = f"{save_path}/minimind-pretrain-{datetime.datetime.now().strftime('%Y-%m-%d')}.pth"
+    model_file = f"{save_path}/doudou-pretrain-{datetime.datetime.now().strftime('%Y-%m-%d')}.pth"
     state_dict = model.state_dict()
     state_dict = {k: v.half() for k, v in state_dict.items()}  # 半精度保存
     torch.save({
@@ -161,8 +161,8 @@ def environment_info():
 
 # torchrun --nproc_per_node 2 1-pretrain.py
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="MiniMind Pretraining")
-    parser.add_argument("--save_dir", type=str, default="/data00/train/minimind/pretrain")
+    parser = argparse.ArgumentParser(description="Doudou Pretraining")
+    parser.add_argument("--save_dir", type=str, default="/data00/train/doudou/pretrain")
     # 若要以最快速度实现zero则epochs设置为1轮；否则应当利用有限的数据训练2~6个epochs。
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--batch_size", type=int, default=16)
@@ -174,11 +174,11 @@ if __name__ == "__main__":
     parser.add_argument("--swanlab_project", type=str, default="minimind")
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--grad_clip", type=float, default=1.0)
-    parser.add_argument("--log_interval", type=int, default=100)
+    parser.add_argument("--log_interval", type=int, default=500)
     parser.add_argument('--hidden_size', default=768, type=int)
     parser.add_argument('--num_hidden_layers', default=16, type=int)
     parser.add_argument('--max_seq_len', default=512, type=int)
-    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_hq.jsonl")
+    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_200k.jsonl")
     args = parser.parse_args()
 
     if args.use_swanlab:

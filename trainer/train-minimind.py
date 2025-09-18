@@ -53,7 +53,7 @@ def train_epoch(epoch, swanlab):
                 Y.view(-1)
             ).view(Y.size())
             loss = (loss * loss_mask).sum() / loss_mask.sum()
-            loss += res.aux_loss
+            # loss += res.aux_loss
             loss = loss / args.accumulation_steps
 
         scaler.scale(loss).backward()
@@ -174,11 +174,11 @@ if __name__ == "__main__":
     parser.add_argument("--swanlab_project", type=str, default="minimind")
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--grad_clip", type=float, default=1.0)
-    parser.add_argument("--log_interval", type=int, default=100)
+    parser.add_argument("--log_interval", type=int, default=500)
     parser.add_argument('--hidden_size', default=768, type=int)
     parser.add_argument('--num_hidden_layers', default=16, type=int)
     parser.add_argument('--max_seq_len', default=512, type=int)
-    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_hq.jsonl")
+    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_200k.jsonl")
     args = parser.parse_args()
 
     if args.use_swanlab:
