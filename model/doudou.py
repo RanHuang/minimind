@@ -31,18 +31,12 @@ class DoudouForCausalLM(PreTrainedModel, GenerationMixin):
         super().__init__(config)
         self.config = config
         self.model = DoudouModel(config)
-        # 设置权重共享
-        if hasattr(self.model, 'token_embedding') and hasattr(self.model, 'output_head'):
-            self.model.output_head.weight = self.model.token_embedding.weight
-
         self.Output = CausalLMOutputWithPast()
 
     def forward(self,
                 input_ids: torch.Tensor,
                 inputs_embeds: Optional[torch.FloatTensor] = None,
                 use_cache: bool = False,
-                cache_position=None,
-                return_dict: bool = True,
                 **kwargs):
         logits, hidden_states = self.model(input_ids=input_ids, inputs_embeds=inputs_embeds, use_cache=use_cache)
 
