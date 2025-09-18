@@ -178,13 +178,15 @@ if __name__ == "__main__":
     parser.add_argument('--hidden_size', default=768, type=int)
     parser.add_argument('--num_hidden_layers', default=16, type=int)
     parser.add_argument('--max_seq_len', default=512, type=int)
-    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_200k.jsonl")
+    parser.add_argument("--data_path", type=str, default="/data00/dataset/minimind_dataset/pretrain_hq.jsonl")
     args = parser.parse_args()
 
     if args.use_swanlab:
         import swanlab
-        gpu_count = torch.cuda.device_count()
-        args.swanlab_run_name = f"{datetime.datetime.now().strftime('%Y-%m-%d')}-minimind-Pretrain-{gpu_count}GPU"
+        import socket
+        hostname = socket.gethostname()
+        local_ip = socket.getaddrinfo(hostname, None)[0][4][0]
+        args.swanlab_run_name = f"{datetime.datetime.now().strftime('%Y-%m-%d')}-minimind-Pretrain-{local_ip.replace('.', '-')}"
         swanlab.init(project=args.swanlab_project, name=args.swanlab_run_name)
         logger.info(f"SwanLab run name: {args.swanlab_run_name}")
     else:
