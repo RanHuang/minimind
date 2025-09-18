@@ -31,6 +31,9 @@ class DoudouForCausalLM(PreTrainedModel, GenerationMixin):
         super().__init__(config)
         self.config = config
         self.model = DoudouModel(config)
+        # 设置权重共享
+        if hasattr(self.model, 'token_embedding') and hasattr(self.model, 'output_head'):
+            self.model.output_head.weight = self.model.token_embedding.weight
 
         self.Output = CausalLMOutputWithPast()
 
@@ -97,7 +100,6 @@ class TransformerBlock(torch.nn.Module):
         shortcut = input_ids
         hidden_states = self.input_norm(input_ids)
         hidden_states = self.multi_head_attention(hidden_states, position_embedding, use_cache=use_cache)
-        hidden_states = self.post_attention_norm(hidden_states)
         hidden_states = shortcut + hidden_states
 
         shortcut = hidden_states
